@@ -33,51 +33,94 @@ def birdseye(img, transform):
     return cv2.warpPerspective(img, transform, RESOLUTION)
 
 
-if __name__ == '__main__':
-    from undistort import undistort
-
-    calib = undistort(cv2.imread('photoset/capture0.jpg'))
-    test = undistort(cv2.imread('photoset/capture12.jpg'))
-
-    trans = birdseye_transform(calib)
-
-    bird = birdseye(test, trans)
-    cv2.imshow("capture", test)
-    # cv2.imshow("bird", bird)
-    # cv2.imshow("bird2", birdseye(calib, trans))
-
-    yuv = cv2.cvtColor(bird, cv2.COLOR_BGR2YUV)
+def u_channel(img):
+    yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
     [y, u, v] = cv2.split(yuv)
-    # cv2.imshow("u", u)
+    return u
 
-    ret, thresh = cv2.threshold(u, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    # cv2.imshow("thresh", thresh)
 
+def sobel(img):
     kernel = np.array([
+        # [-1, -1, -1, 2, 2, 2, -1, -1, -1],
+        # [-1, -1, -1, 2, 2, 2, -1, -1, -1],
+        # [-1, -1, -1, 2, 2, 2, -1, -1, -1],
+        [-1, -1, 2, 2, -1, -1],
         [-1, -1, 2, 2, -1, -1],
         [-1, -1, 2, 2, -1, -1],
     ], np.float32)
-    filtered = cv2.filter2D(thresh, -1, kernel)
-    # cv2.imshow("filtered", filtered)
+    return cv2.filter2D(img, -1, kernel)
 
-    lines = cv2.HoughLinesP(filtered, 1, math.pi/180, 10, minLineLength=20)
-    line_img = np.zeros((*RESOLUTION[::-1], 3), np.uint8)
+
+def threshold(img):
+    ret, thresh = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
+    return thresh
+
+
+def detect_lines(img):
+    lines = cv2.HoughLinesP(img, 1, math.pi/180, 10, minLineLength=3)
+    if lines is None:
+        return [], [0, 0, 0]
     line_x, line_y = [], []
     for [[x1, y1, x2, y2]] in lines:
         line_x.extend((x1 - RESOLUTION[0]/2, x2 - RESOLUTION[0]/2))
         line_y.extend((RESOLUTION[1] - y1, RESOLUTION[1] - y2))
-        cv2.line(line_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
     line_coeff = np.polyfit(line_y, line_x, 2)
-    p = np.poly1d(line_coeff)
-    print("line:", p)
-    print("curvature: {}, slope: {}, offset: {}".format(*line_coeff))
 
+    return lines, line_coeff
+
+
+def debug_lines(img, lines):
+    for [[x1, y1, x2, y2]] in lines:
+        cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+
+def debug_curve(img, line_coeff):
+    p = np.poly1d(line_coeff)
     for n in range(0, 480, 10):
         x, y = p(n) + RESOLUTION[0]/2, RESOLUTION[1] - n
-        cv2.circle(line_img, (int(x),y), 3, (0, 0, 255))
-    cv2.imshow("line_img", line_img)
+        cv2.circle(img, (int(x),y), 3, (0, 0, 255))
 
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    from undistort import undistort
+
+    calib = undistort(cv2.imread('photoset/capture0.jpg'))
+
+    trans = birdseye_transform(calib)
+
+    for n in range(5, 23, 1):
+        test = undistort(cv2.imread('photoset/capture{}.jpg'.format(n)))
+        bird = birdseye(test, trans)
+        # cv2.imshow("capture", test)
+        # cv2.imshow("bird", bird)
+        # cv2.imshow("calib", calib)
+        # cv2.imshow("calib bird", birdseye(calib, trans))
+
+        u = u_channel(bird)
+        # cv2.imshow("u", u)
+
+        filtered = sobel(u)
+        # cv2.imshow("filtered", filtered)
+
+        thresh = threshold(filtered)
+        # cv2.imshow("thresh", thresh)
+
+        # line_img = np.zeros((*RESOLUTION[::-1], 3), np.uint8)
+        line_img = bird
+
+        lines, line_coeff = detect_lines(thresh)
+        p = np.poly1d(line_coeff)
+        print("line:", p)
+        print("curvature: {}, slope: {}, offset: {}".format(*line_coeff))
+
+        if len(lines) != 0:
+            debug_lines(line_img, lines)
+            debug_curve(line_img, line_coeff)
+
+        cv2.imshow('capture {}'.format(n), line_img)
+        cv2.imwrite('output/lines{}.jpg'.format(n), line_img)
+
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
