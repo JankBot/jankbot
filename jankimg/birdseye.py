@@ -121,7 +121,7 @@ if __name__ == '__main__':
             debug_curve(line_img, line_coeff)
 
         cv2.imshow('capture {}'.format(n), line_img)
-        # cv2.imwrite('output/lines{}.jpg'.format(n), line_img)
+        # cv2.imwrite('output/lines{}.png'.format(n), line_img)
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
