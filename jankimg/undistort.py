@@ -1,12 +1,14 @@
 import cv2
 import numpy as np
 import sys
-import os
-import glob
 
 assert cv2.__version__[0] == '3', 'The fisheye module requires opencv version >= 3.0.0'
 
-# found using other code
+
+# from: https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
+
+
+# found using other calibrate.py
 DIM=(720, 480)
 K=np.array([[347.0464967569512, 0.0, 345.6381028423219], [0.0, 349.23483039090365, 193.6250314050006], [0.0, 0.0, 1.0]])
 D=np.array([[-0.03483461030252116], [0.0029723614826183634], [-0.004590284238468527], [0.0008656745800786099]])
