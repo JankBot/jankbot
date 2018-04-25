@@ -71,6 +71,7 @@ if __name__ == '__main__':
     line_coeff = np.polyfit(line_y, line_x, 2)
     p = np.poly1d(line_coeff)
     print("line:", p)
+    print("curvature: {}, slope: {}, offset: {}".format(*line_coeff))
 
     for n in range(0, 480, 10):
         x, y = p(n) + RESOLUTION[0]/2, RESOLUTION[1] - n
