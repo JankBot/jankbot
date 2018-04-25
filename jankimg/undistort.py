@@ -17,7 +17,8 @@ map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, DIM, cv2.CV
 
 
 def undistort(img):
-    return cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    undistorted = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    return cv2.rotate(undistorted, cv2.ROTATE_180)
 
 
 if __name__ == '__main__':
