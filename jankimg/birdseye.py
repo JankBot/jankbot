@@ -19,9 +19,11 @@ def birdseye_transform(img):
 
 
     rw, rh = RESOLUTION
-    p = 200
+    chessboard_w = 40
+    pad_x = (rw - chessboard_w) / 2
+    pad_y = rh - (h / w * (rw - 2*pad_x))
 
-    dest = np.array([[p,2*p], [rw-p, 2*p], [p, rh], [rw-p, rh]], dtype='float32')
+    dest = np.array([[pad_x,pad_y], [rw-pad_x, pad_y], [pad_x, rh], [rw-pad_x, rh]], dtype='float32')
 
     return cv2.getPerspectiveTransform(corners, dest)
 
@@ -40,8 +42,12 @@ if __name__ == '__main__':
 
     bird = birdseye(test, trans)
     cv2.imshow("capture", test)
-    cv2.imshow("bird", bird)
-    cv2.imshow("bird2", birdseye(calib, trans))
+    # cv2.imshow("bird", bird)
+    # cv2.imshow("bird2", birdseye(calib, trans))
+
+    yuv = cv2.cvtColor(bird, cv2.COLOR_BGR2YUV)
+    [y, u, v] = cv2.split(yuv)
+    cv2.imshow("u", u)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
