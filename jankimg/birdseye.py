@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import sys
+import math
 
 
 RESOLUTION = (720, 480)
@@ -50,11 +51,31 @@ if __name__ == '__main__':
     # cv2.imshow("u", u)
 
     ret, thresh = cv2.threshold(u, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    cv2.imshow("thresh", thresh)
+    # cv2.imshow("thresh", thresh)
 
-    kernel = np.array([[-1, -1, 2, 2, -1, -1]], np.float32)
-    filtered = cv2.filter2D(u, -1, kernel)
+    kernel = np.array([
+        [-1, -1, 2, 2, -1, -1],
+        [-1, -1, 2, 2, -1, -1],
+    ], np.float32)
+    filtered = cv2.filter2D(thresh, -1, kernel)
     # cv2.imshow("filtered", filtered)
+
+    lines = cv2.HoughLinesP(filtered, 1, math.pi/180, 10, minLineLength=20)
+    line_img = np.zeros((*RESOLUTION[::-1], 3), np.uint8)
+    line_x, line_y = [], []
+    for [[x1, y1, x2, y2]] in lines:
+        line_x.extend((x1 - RESOLUTION[0]/2, x2 - RESOLUTION[0]/2))
+        line_y.extend((RESOLUTION[1] - y1, RESOLUTION[1] - y2))
+        cv2.line(line_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+    line_coeff = np.polyfit(line_y, line_x, 2)
+    p = np.poly1d(line_coeff)
+    print("line:", p)
+
+    for n in range(0, 480, 10):
+        x, y = p(n) + RESOLUTION[0]/2, RESOLUTION[1] - n
+        cv2.circle(line_img, (int(x),y), 3, (0, 0, 255))
+    cv2.imshow("line_img", line_img)
 
 
     cv2.waitKey(0)
