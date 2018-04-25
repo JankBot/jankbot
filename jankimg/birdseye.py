@@ -76,6 +76,7 @@ def debug_lines(img, lines):
 
 
 def debug_curve(img, line_coeff):
+    cv2.putText(img, str(line_coeff), (10, RESOLUTION[1]-10), cv2.FONT_HERSHEY_SIMPLEX, .4, (0, 0, 255))
     p = np.poly1d(line_coeff)
     for n in range(0, 480, 10):
         x, y = p(n) + RESOLUTION[0]/2, RESOLUTION[1] - n
