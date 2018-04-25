@@ -47,7 +47,15 @@ if __name__ == '__main__':
 
     yuv = cv2.cvtColor(bird, cv2.COLOR_BGR2YUV)
     [y, u, v] = cv2.split(yuv)
-    cv2.imshow("u", u)
+    # cv2.imshow("u", u)
+
+    ret, thresh = cv2.threshold(u, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    cv2.imshow("thresh", thresh)
+
+    kernel = np.array([[-1, -1, 2, 2, -1, -1]], np.float32)
+    filtered = cv2.filter2D(u, -1, kernel)
+    # cv2.imshow("filtered", filtered)
+
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
