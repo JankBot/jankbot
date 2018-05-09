@@ -10,6 +10,9 @@ SMOOTHING = .3
 
 
 def smooth(old, new, alpha=SMOOTHING):
+    if not old:
+        return new
+
     return [
         old_val + alpha * (new_val - old_val)
         for old_val, new_val in zip(old, new)
