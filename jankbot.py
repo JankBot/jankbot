@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import time
+
 import config
 from camera import Camera
 from platform import Controller, car
@@ -10,6 +12,7 @@ if __name__ == '__main__':
 
     try:
         cam.start()
+        time.sleep(2.0)
         while True:
             controller.step()
     except KeyboardInterrupt:
