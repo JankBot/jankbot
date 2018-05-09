@@ -5,9 +5,13 @@ from camera import Camera
 from platform import Controller, car
 
 if __name__ == '__main__':
-    cam = Camera(config.CALIB_IMG)
+    cam = Camera(config.CALIB_IMG, config.IMG_RESOLUTION, config.FRAME_RATE)
     controller = Controller(car, cam)
 
-    while True:
-        controller.step()
+    try:
+        cam.start()
+        while True:
+            controller.step()
+    except KeyboardInterrupt:
+        cam.stop()
 
