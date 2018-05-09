@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import math
 
+from .undistort import undistort
+
 
 RESOLUTION = (720, 480)
 CHECKERBOARD = (7,5)
@@ -20,7 +22,7 @@ def birdseye_transform(img):
 
 
     rw, rh = RESOLUTION
-    chessboard_w = 40
+    chessboard_w = 35
     pad_x = (rw - chessboard_w) / 2
     pad_y = rh - (h / w * (rw - 2*pad_x))
 
@@ -83,45 +85,48 @@ def debug_curve(img, line_coeff):
         cv2.circle(img, (int(x),y), 3, (0, 0, 255))
 
 
+def img_test(path):
+    test = undistort(cv2.imread(path))
+    bird = birdseye(test, trans)
+    # cv2.imshow("capture", test)
+    # cv2.imshow("bird", bird)
+    # cv2.imshow("calib", calib)
+    # cv2.imshow("calib bird", birdseye(calib, trans))
+
+    u = u_channel(bird)
+    # cv2.imshow("u", u)
+
+    filtered = sobel(u)
+    # cv2.imshow("filtered", filtered)
+
+    thresh = threshold(filtered)
+    # cv2.imshow("thresh", thresh)
+
+    # line_img = np.zeros((*RESOLUTION[::-1], 3), np.uint8)
+    line_img = bird
+
+    lines, line_coeff = detect_lines(thresh)
+    p = np.poly1d(line_coeff)
+    print("line:", p)
+    print("curvature: {}, slope: {}, offset: {}".format(*line_coeff))
+
+    if len(lines) != 0:
+        debug_lines(line_img, lines)
+        debug_curve(line_img, line_coeff)
+
+    cv2.imshow(path, line_img)
+    # cv2.imwrite('output/lines{}.png'.format(n), line_img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
-    from undistort import undistort
 
     calib = undistort(cv2.imread('photoset/capture0.jpg'))
 
     trans = birdseye_transform(calib)
 
-    for n in range(5, 23, 1):
-        test = undistort(cv2.imread('photoset/capture{}.jpg'.format(n)))
-        bird = birdseye(test, trans)
-        # cv2.imshow("capture", test)
-        # cv2.imshow("bird", bird)
-        # cv2.imshow("calib", calib)
-        # cv2.imshow("calib bird", birdseye(calib, trans))
+    for path in sys.argv[1:]:
+        img_test(path)
 
-        u = u_channel(bird)
-        # cv2.imshow("u", u)
-
-        filtered = sobel(u)
-        # cv2.imshow("filtered", filtered)
-
-        thresh = threshold(filtered)
-        # cv2.imshow("thresh", thresh)
-
-        # line_img = np.zeros((*RESOLUTION[::-1], 3), np.uint8)
-        line_img = bird
-
-        lines, line_coeff = detect_lines(thresh)
-        p = np.poly1d(line_coeff)
-        print("line:", p)
-        print("curvature: {}, slope: {}, offset: {}".format(*line_coeff))
-
-        if len(lines) != 0:
-            debug_lines(line_img, lines)
-            debug_curve(line_img, line_coeff)
-
-        cv2.imshow('capture {}'.format(n), line_img)
-        # cv2.imwrite('output/lines{}.png'.format(n), line_img)
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
