@@ -1,4 +1,4 @@
 
-CALIB_IMG='photoset/capture0.jpg'
+CALIB_IMG='test_calib.jpg'
 IMG_RESOLUTION=(720, 480)
 FRAME_RATE=30
