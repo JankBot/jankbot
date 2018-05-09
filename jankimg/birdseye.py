@@ -112,6 +112,9 @@ def img_test(path):
     print("line:", p)
     print("curvature: {}, slope: {}, offset: {}".format(*line_coeff))
 
+    from controller import Controller
+    print("speed: {}, steer: {}".format(*Controller(None, None).follow_line(line_coeff)))
+
     if len(lines) != 0:
         debug_lines(line_img, lines)
         debug_curve(line_img, line_coeff)

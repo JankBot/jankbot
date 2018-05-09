@@ -1,12 +1,7 @@
 import smbus
-import numpy as np
 import math
 
 i2c = smbus.SMBus(1)
-LOOKAHEAD = 200
-DRIFT = .01  # rad/px offset
-RAD_PER_DEG_STEER = math.pi/180 * (2/3)
-SPEED = 100
 
 class Car(object):
     def __init__(self, addr, trim_throttle=0, trim_steer=0):
@@ -25,23 +20,4 @@ class Car(object):
 
 car = Car(19)
 
-
-class Controller(object):
-    def __init__(self, car, cam):
-        self.car = car
-        self.cam = cam
-
-    def step(self):
-        line = self.cam.get_line()
-        p = np.poly1d(line)
-
-        theta_c = math.atan2(p(LOOKAHEAD), LOOKAHEAD)
-        dist = math.cos(theta_c) * p(0)
-        theta_t = dist * DRIFT
-        theta = theta_c + theta_t
-        # clip theta between -pi/2 and pi/2
-        steer = (theta + math.pi/2) / RAD_PER_DEG_STEER
-        speed = SPEED
-
-        self.car.drive(speed, steer)
 

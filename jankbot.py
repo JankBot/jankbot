@@ -4,7 +4,8 @@ import time
 
 import config
 from camera import Camera
-from platform import Controller, car
+from platform import car
+from controller import Controller
 
 if __name__ == '__main__':
     cam = Camera(config.CALIB_IMG, config.IMG_RESOLUTION, config.FRAME_RATE)
