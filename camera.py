@@ -9,7 +9,7 @@ cap = cv2.VideoCapture(0)
 class Camera(object):
     def __init__(self, calib_img, cap=cap):
         self.cap = cap
-        self.transform = birdseye_transform(calib_img)
+        self.transform = birdseye_transform(cv2.imread(calib_img))
 
     def get_line(self):
         ret, frame = self.cap.read()
