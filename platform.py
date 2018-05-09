@@ -40,7 +40,7 @@ class Controller(object):
         theta_t = dist * DRIFT
         theta = theta_c + theta_t
         # clip theta between -pi/2 and pi/2
-        steer = theta / RAD_PER_DEG_STEER + 90
+        steer = (theta + math.pi/2) / RAD_PER_DEG_STEER
         speed = SPEED
 
         self.car.drive(speed, steer)
