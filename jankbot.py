@@ -17,7 +17,7 @@ if __name__ == '__main__':
             start = time.perf_counter()
             controller.step()
             end = time.perf_counter()
-            print('\r{} ms'.format(end-start))
+            print('{} s'.format(end-start), end='\r')
     except KeyboardInterrupt:
         cam.stop()
 
