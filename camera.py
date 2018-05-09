@@ -8,7 +8,8 @@ from jankimg.birdseye import *
 class Camera(object):
     def __init__(self, calib_img, resolution, framerate):
         self.stream = PiVideoStream(resolution=resolution, framerate=framerate)
-        self.transform = birdseye_transform(cv2.imread(calib_img))
+        calib = undistort(cv2.imread(calib_img))
+        self.transform = birdseye_transform(calib)
 
     def start(self):
         self.stream.start()

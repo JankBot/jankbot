@@ -12,6 +12,8 @@ CHECKERBOARD = (7,5)
 
 def birdseye_transform(img):
     ret, corners = cv2.findChessboardCorners(img, CHECKERBOARD)
+    if not ret:
+        raise Exception("failed to find chessboard")
     cv2.drawChessboardCorners(img, CHECKERBOARD, corners, ret)
 
     w, h = CHECKERBOARD
@@ -122,10 +124,15 @@ def img_test(path):
 
 
 if __name__ == '__main__':
+    import config
 
-    calib = undistort(cv2.imread('photoset/capture0.jpg'))
+    calib = undistort(cv2.imread(config.CALIB_IMG))
 
     trans = birdseye_transform(calib)
+
+    cv2.imshow('calib', calib)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     for path in sys.argv[1:]:
         img_test(path)
