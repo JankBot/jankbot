@@ -37,7 +37,6 @@ class Controller(object):
 
     def step(self):
         line = self.cam.get_line()
-        self.filter.update()
         speed, steer = self.follow_line(line)
 
         self.car.drive(speed, steer)
