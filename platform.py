@@ -17,8 +17,8 @@ class Car(object):
     def drive(self, esc, steer):
         clip = lambda x: min(180, max(0, x))
 
-        actual_throttle = clip(esc + self.trim_throttle)
-        actual_steer = clip(steer + self.trim_steer)
+        actual_throttle = int(clip(esc + self.trim_throttle))
+        actual_steer = int(clip(steer + self.trim_steer))
 
         i2c.write_byte_data(self.addr, actual_throttle, actual_steer)
 
