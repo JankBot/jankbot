@@ -10,7 +10,7 @@ SMOOTHING = .3
 
 
 def smooth(old, new, alpha=SMOOTHING):
-    if not old:
+    if old is None:
         return new
 
     return [
