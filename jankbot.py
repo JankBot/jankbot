@@ -20,5 +20,6 @@ if __name__ == '__main__':
             end = time.perf_counter()
             print('{} s'.format(end-start), end='\r')
     except KeyboardInterrupt:
+        car.stop()
         cam.stop()
 
