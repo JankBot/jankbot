@@ -2,11 +2,11 @@ import math
 
 import numpy as np
 
-LOOKAHEAD = 200
+LOOKAHEAD = 100
 DRIFT = .01  # rad/px offset
 RAD_PER_DEG_STEER = math.pi/180 * (2/3)
-SPEED = 100
-SMOOTHING = .3
+SPEED = 105
+SMOOTHING = 1.0
 
 
 def smooth(old, new, alpha=SMOOTHING):
